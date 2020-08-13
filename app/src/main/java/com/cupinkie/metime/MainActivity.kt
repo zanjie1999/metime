@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity() {
                 timeText.text = sdfTime.format(d)
                 dateText.text = sdfDate.format(d)
 
-                handler.postDelayed(this, 1000)
+                handler.postDelayed(this, 500)
             }
         }
         handler.postDelayed(runnable, 1000)
