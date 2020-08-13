@@ -1,0 +1,78 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <EditTextPreference
+        app:defaultValue=""
+        app:key="tip"
+        app:title="提醒"
+        app:summary=" "/>
+
+    <Preference
+        app:title="选择背景图片目录"
+        app:key="photoPath"
+        app:summary=" "/>
+
+    <EditTextPreference
+        app:defaultValue="15"
+        app:key="marginTop"
+        android:inputType="number"
+        app:title="上边距"
+        app:summary=" "/>
+
+    <EditTextPreference
+        app:defaultValue="15"
+        app:key="marginBottom"
+        android:inputType="number"
+        app:title="下边距"
+        app:summary=" "/>
+
+    <EditTextPreference
+        app:defaultValue="40"
+        app:key="marginLeft"
+        android:inputType="number"
+        app:title="左边距"
+        app:summary=" "/>
+
+    <EditTextPreference
+        app:defaultValue="40"
+        app:key="marginRight"
+        android:inputType="number"
+        app:title="右边距"
+        app:summary=" "/>
+
+    <EditTextPreference
+        app:defaultValue="70"
+        app:key="timeFontSize"
+        android:inputType="number"
+        app:title="时间大小"
+        app:summary=" "/>
+
+    <EditTextPreference
+        app:defaultValue="30"
+        app:key="dateFontSize"
+        android:inputType="number"
+        app:title="日期大小"
+        app:summary=" "/>
+
+    <EditTextPreference
+        app:defaultValue="30"
+        app:key="tipFontSize"
+        android:inputType="number"
+        app:title="消息大小"
+        app:summary=" "/>
+
+    <SwitchPreferenceCompat
+        app:defaultValue="false"
+        app:key="use24hTime"
+        app:summaryOff="12小时制"
+        app:summaryOn="24小时制"
+        app:title="时间格式" />
+
+    <SwitchPreferenceCompat
+        app:defaultValue="true"
+        app:key="showSecond"
+        app:summaryOff="不显示"
+        app:summaryOn="显示"
+        app:title="秒" />
+
+</PreferenceScreen>
