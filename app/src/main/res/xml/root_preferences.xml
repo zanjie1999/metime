@@ -75,4 +75,11 @@
         app:summaryOn="显示"
         app:title="秒" />
 
+    <SwitchPreferenceCompat
+        app:defaultValue="false"
+        app:key="startAtBooted"
+        app:summaryOff="不自启"
+        app:summaryOn="自启"
+        app:title="开机自动启动" />
+
 </PreferenceScreen>
