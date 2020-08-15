@@ -1,26 +1,30 @@
 package com.cupinkie.metime
 
-import android.annotation.SuppressLint
-import android.app.ActionBar
+import android.Manifest
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.hardware.SensorManager
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
-import android.view.*
-import android.widget.LinearLayout
+import android.view.OrientationEventListener
+import android.view.Window
+import android.view.WindowManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
-    lateinit var orientationListener:OrientationEventListener
+    lateinit var orientationListener: OrientationEventListener
 
     // 默认横屏
     var screenOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
@@ -42,82 +46,112 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        // 屏幕旋转监听
-        setRequestedOrientation(screenOrientation)
-        orientationListener = object : OrientationEventListener(this,SensorManager.SENSOR_DELAY_UI) {
-            override fun onOrientationChanged(orientation: Int) {
-                if (orientation > 80 && orientation < 100) { //90度 横向翻转
-                    if (screenOrientation != 90) {
-                        screenOrientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("landscapeScreen", true)) {
+            // 屏幕旋转监听
+            setRequestedOrientation(screenOrientation)
+            orientationListener = object : OrientationEventListener(this, SensorManager.SENSOR_DELAY_UI) {
+                override fun onOrientationChanged(orientation: Int) {
+                    if (orientation > 80 && orientation < 100) { //90度 横向翻转
+                        if (screenOrientation != 90) {
+                            screenOrientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
+                            setRequestedOrientation(screenOrientation)
+                        }
+                    } else if (orientation > 260 && orientation < 280) { //270度 横向
+                        screenOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                         setRequestedOrientation(screenOrientation)
+                    } else {
+                        return;
                     }
-                } else if (orientation > 260 && orientation < 280) { //270度 横向
-                    screenOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                    setRequestedOrientation(screenOrientation)
-                } else {
-                    return;
                 }
             }
-        }
-        if (orientationListener.canDetectOrientation()) {
-            Log.v("Sparkle", "屏幕旋转 初始化成功");
-            orientationListener.enable();
-        } else {
-            Log.v("Sparkle", "屏幕旋转 初始化失败");
-            orientationListener.disable();
-        }
-
-        // 读取设置 没设置就是这默认值
-        val scale = getResources().getDisplayMetrics().density;
-//        var sp = getSharedPreferences("Sparkle", 0)
-        val sp = PreferenceManager.getDefaultSharedPreferences(this)
-        val tip = sp.getString("tip", "")
-        val photoPath = sp.getString("photoPath", "")
-        val marginTop = (sp.getString("marginTop", "15")!!.toInt() * scale + 0.5).toInt()
-        val marginBottom = (sp.getString("marginBottom", "15")!!.toInt() * scale + 0.5).toInt()
-        val marginLeft = (sp.getString("marginLeft", "40")!!.toInt() * scale + 0.5).toInt()
-        val marginRight = (sp.getString("marginRight", "40")!!.toInt() * scale + 0.5).toInt()
-        val timeFontSize = sp.getString("timeFontSize", "70")!!.toInt()
-        val dateFontSize = sp.getString("dateFontSize", "30")!!.toInt()
-        val tipFontSize = sp.getString("tipFontSize", "30")!!.toInt()
-        val use24hTime = sp.getBoolean("use24hTime", false)
-        val showSecond = sp.getBoolean("showSecond", true)
-
-        Log.v("margin", marginLeft.toString() + " " + marginTop + " " + marginRight + " " + marginBottom)
-
-        // 准备界面
-        timeText.setPadding(marginLeft,0,0,marginBottom)
-        timeText.textSize = timeFontSize.toFloat()
-        dateText.setPadding(0,0,marginRight,marginBottom)
-        dateText.textSize = dateFontSize.toFloat()
-        tipText.setPadding(0,marginTop,0,0)
-        tipText.textSize = tipFontSize.toFloat()
-
-        if (!photoPath.isNullOrEmpty()) {
-            val f = File(photoPath)
-            if (f.isFile) {
-                bgImage.setImageURI(Uri.fromFile(f))
-            }
-        }
-
-        if (!tip.isNullOrBlank()) {
-            tipText.text = tip
-        }
-
-        if (use24hTime) {
-            if (showSecond) {
-                sdfTime = SimpleDateFormat("H:mm:ss")
+            if (orientationListener.canDetectOrientation()) {
+                Log.v("Sparkle", "屏幕旋转 初始化成功");
+                orientationListener.enable();
             } else {
-                sdfTime = SimpleDateFormat("H:mm")
-            }
-        } else {
-            if (showSecond) {
-                sdfTime = SimpleDateFormat("h:mm:ss")
-            } else {
-                sdfTime = SimpleDateFormat("h:mm")
+                Log.v("Sparkle", "屏幕旋转 初始化失败");
+                orientationListener.disable();
             }
         }
 
+        // 存储空间权限
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE ) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 101)
+        }
+
+        try {
+            // 读取设置 没设置就是这默认值
+            val scale = this.resources.displayMetrics.scaledDensity;
+            val sp = PreferenceManager.getDefaultSharedPreferences(this)
+            val tip = sp.getString("tip", "")
+            val photoPath = sp.getString("photoPath", "")
+            val marginTopTip = (sp.getString("marginTopTip", "15")!!.toInt() * scale + 0.5f).toInt()
+            val marginBottomTime = (sp.getString("marginBottomTime", "15")!!.toInt() * scale + 0.5f).toInt()
+            val marginBottomDate = (sp.getString("marginBottomDate", "15")!!.toInt() * scale + 0.5f).toInt()
+            val marginLeftTime = (sp.getString("marginLeftTime", "40")!!.toInt() * scale + 0.5f).toInt()
+            val marginRightDate = (sp.getString("marginRightDate", "40")!!.toInt() * scale + 0.5f).toInt()
+            val timeFontSize = sp.getString("timeFontSize", "70")!!.toInt()
+            val dateFontSize = sp.getString("dateFontSize", "30")!!.toInt()
+            val tipFontSize = sp.getString("tipFontSize", "30")!!.toInt()
+            val use24hTime = sp.getBoolean("use24hTime", false)
+            val showSecond = sp.getBoolean("showSecond", true)
+            val useWhiteText = sp.getBoolean("useWhiteText", false)
+            val keepScreenOn = sp.getBoolean("keepScreenOn", false)
+
+            if (keepScreenOn) {
+                // 保持亮屏
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            }
+
+            // 准备界面
+            timeText.setPadding(marginLeftTime, 0, 0, marginBottomTime)
+            timeText.textSize = timeFontSize.toFloat()
+            dateText.setPadding(0, 0, marginRightDate, marginBottomDate)
+            dateText.textSize = dateFontSize.toFloat()
+            tipText.setPadding(0, marginTopTip, 0, 0)
+            tipText.textSize = tipFontSize.toFloat()
+            if (useWhiteText) {
+//                timeText.setTextColor(this.resources.getColor(R.color.white_overlay))
+                timeText.setTextColor(ContextCompat.getColor(this, R.color.white_overlay_text))
+                dateText.setTextColor(ContextCompat.getColor(this, R.color.white_overlay_text))
+                tipText.setTextColor(ContextCompat.getColor(this, R.color.white_overlay_text))
+            } else {
+                timeText.setTextColor(ContextCompat.getColor(this, R.color.black_overlay_text))
+                dateText.setTextColor(ContextCompat.getColor(this, R.color.black_overlay_text))
+                tipText.setTextColor(ContextCompat.getColor(this, R.color.black_overlay_text))
+            }
+
+            if (!tip.isNullOrBlank()) {
+                tipText.text = tip
+            }
+
+            if (use24hTime) {
+                if (showSecond) {
+                    sdfTime = SimpleDateFormat("H:mm:ss")
+                } else {
+                    sdfTime = SimpleDateFormat("H:mm")
+                }
+            } else {
+                if (showSecond) {
+                    sdfTime = SimpleDateFormat("h:mm:ss")
+                } else {
+                    sdfTime = SimpleDateFormat("h:mm")
+                }
+            }
+
+            if (!photoPath.isNullOrEmpty()) {
+                val bitmap = BitmapFactory.decodeFile(photoPath)
+                bgImage.setImageBitmap(bitmap)
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, "请检查设置：" + e.message, Toast.LENGTH_LONG).show()
+            startActivity(
+                Intent(this, SettingsActivity::class.java)
+                    .putExtra("lastBackKeyTime", System.currentTimeMillis())
+                    .putExtra("screenOrientation", screenOrientation)
+            )
+            e.printStackTrace()
+            return
+        }
 
 
         // 时间显示线程
@@ -150,10 +184,6 @@ class MainActivity : AppCompatActivity() {
             handler.removeCallbacks(runnable)
         }
     }
-
-
-
-
 
 
 }
