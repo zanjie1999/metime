@@ -85,6 +85,13 @@
         app:title="秒" />
 
     <SwitchPreferenceCompat
+        app:defaultValue="true"
+        app:key="showYear"
+        app:summaryOff="不显示"
+        app:summaryOn="显示"
+        app:title="年" />
+
+    <SwitchPreferenceCompat
         app:defaultValue="false"
         app:key="useWhiteText"
         app:summaryOff="黑"

@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         supportActionBar?.hide()
         //去除状态栏
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
 
         setContentView(R.layout.activity_main)
 
@@ -94,12 +94,13 @@ class MainActivity : AppCompatActivity() {
             val tipFontSize = sp.getString("tipFontSize", "30")!!.toInt()
             val use24hTime = sp.getBoolean("use24hTime", false)
             val showSecond = sp.getBoolean("showSecond", true)
+            val showYear = sp.getBoolean("showYear", true)
             val useWhiteText = sp.getBoolean("useWhiteText", false)
             val keepScreenOn = sp.getBoolean("keepScreenOn", false)
 
             if (keepScreenOn) {
                 // 保持亮屏
-                getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             }
 
             // 准备界面
@@ -136,6 +137,12 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     sdfTime = SimpleDateFormat("h:mm")
                 }
+            }
+
+            if (showYear) {
+                sdfDate = SimpleDateFormat("yyyy年M月d日 E")
+            } else {
+                sdfDate = SimpleDateFormat("M月d日 E")
             }
 
             if (!photoPath.isNullOrEmpty()) {
