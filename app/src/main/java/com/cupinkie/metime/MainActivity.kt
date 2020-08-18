@@ -32,7 +32,9 @@ class MainActivity : AppCompatActivity() {
     private var handler: Handler = Handler()
     private var runnable: Runnable? = null
     var sdfDate = SimpleDateFormat("yyyy年M月d日 E")
-    var sdfTime = SimpleDateFormat("h:mm:ss")
+    var sdfTime = SimpleDateFormat("h:mm")
+    var sdfTimeSecond = SimpleDateFormat(":ss")
+    var smallSecond = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,11 +91,16 @@ class MainActivity : AppCompatActivity() {
             val marginBottomDate = (sp.getString("marginBottomDate", "15")!!.toInt() * scale + 0.5f).toInt()
             val marginLeftTime = (sp.getString("marginLeftTime", "40")!!.toInt() * scale + 0.5f).toInt()
             val marginRightDate = (sp.getString("marginRightDate", "40")!!.toInt() * scale + 0.5f).toInt()
+//            val marginTopTip = sp.getString("marginTopTip", "15")!!.toInt()
+//            val marginBottomTime = sp.getString("marginBottomTime", "15")!!.toInt()
+//            val marginBottomDate = sp.getString("marginBottomDate", "15")!!.toInt()
+//            val marginLeftTime = sp.getString("marginLeftTime", "40")!!.toInt()
+//            val marginRightDate = sp.getString("marginRightDate", "40")!!.toInt()
             val timeFontSize = sp.getString("timeFontSize", "70")!!.toInt()
             val dateFontSize = sp.getString("dateFontSize", "30")!!.toInt()
             val tipFontSize = sp.getString("tipFontSize", "30")!!.toInt()
             val use24hTime = sp.getBoolean("use24hTime", false)
-            val showSecond = sp.getBoolean("showSecond", true)
+            val showSecond = sp.getString("showSecond", "2")
             val showYear = sp.getBoolean("showYear", true)
             val useWhiteText = sp.getBoolean("useWhiteText", false)
             val keepScreenOn = sp.getBoolean("keepScreenOn", false)
@@ -103,7 +110,8 @@ class MainActivity : AppCompatActivity() {
                 window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             }
 
-            // 准备界面
+            // 准备界面  字体自带边缘所以小秒底部x2
+            timeSecondText.setPadding(0, 0, 0, marginBottomTime * 2)
             timeText.setPadding(marginLeftTime, 0, 0, marginBottomTime)
             timeText.textSize = timeFontSize.toFloat()
             dateText.setPadding(0, 0, marginRightDate, marginBottomDate)
@@ -126,18 +134,19 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (use24hTime) {
-                if (showSecond) {
+                if (showSecond == "1") {
                     sdfTime = SimpleDateFormat("H:mm:ss")
                 } else {
                     sdfTime = SimpleDateFormat("H:mm")
                 }
             } else {
-                if (showSecond) {
+                if (showSecond == "1") {
                     sdfTime = SimpleDateFormat("h:mm:ss")
                 } else {
                     sdfTime = SimpleDateFormat("h:mm")
                 }
             }
+            smallSecond = showSecond == "2"
 
             if (showYear) {
                 sdfDate = SimpleDateFormat("yyyy年M月d日 E")
@@ -167,6 +176,9 @@ class MainActivity : AppCompatActivity() {
                 val d = Date()
                 timeText.text = sdfTime.format(d)
                 dateText.text = sdfDate.format(d)
+                if (smallSecond) {
+                    timeSecondText.text = sdfTimeSecond.format(d)
+                }
 
                 handler.postDelayed(this, 500)
             }

@@ -77,15 +77,16 @@
         app:summaryOn="24小时制"
         app:title="时间格式" />
 
-    <SwitchPreferenceCompat
-        app:defaultValue="true"
-        app:key="showSecond"
-        app:summaryOff="不显示"
-        app:summaryOn="显示"
-        app:title="秒" />
+    <ListPreference
+        android:defaultValue="1"
+        android:entries="@array/showSecond"
+        android:entryValues="@array/showSecond_values"
+        android:key="showSecond"
+        android:title="秒"
+        app:useSimpleSummaryProvider="true" />
 
-    <SwitchPreferenceCompat
-        app:defaultValue="true"
+        <SwitchPreferenceCompat
+        app:defaultValue="false"
         app:key="showYear"
         app:summaryOff="不显示"
         app:summaryOn="显示"
