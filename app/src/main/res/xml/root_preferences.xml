@@ -21,6 +21,12 @@
         app:useSimpleSummaryProvider="true" />
 
     <EditTextPreference
+        app:defaultValue="55"
+        app:key="marginTopMsg"
+        app:title="消息上边距"
+        app:useSimpleSummaryProvider="true" />
+
+    <EditTextPreference
         app:defaultValue="15"
         app:key="marginBottomTime"
         app:title="时间下边距"
@@ -33,7 +39,7 @@
         app:useSimpleSummaryProvider="true" />
 
     <EditTextPreference
-        app:defaultValue="15"
+        app:defaultValue="20"
         app:key="marginBottomDate"
         app:title="日期下边距"
         app:useSimpleSummaryProvider="true" />
@@ -64,6 +70,12 @@
         app:defaultValue="30"
         app:key="tipFontSize"
         app:title="提醒大小"
+        app:useSimpleSummaryProvider="true" />
+
+    <EditTextPreference
+        app:defaultValue="40"
+        app:key="msgFontSize"
+        app:title="消息大小"
         app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
