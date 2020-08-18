@@ -117,6 +117,13 @@
 
     <SwitchPreferenceCompat
         app:defaultValue="false"
+        app:key="startMsgSocket"
+        app:summaryOff="关闭"
+        app:summaryOn="Socket监听端口：50803"
+        app:title="消息接收服务" />
+
+    <SwitchPreferenceCompat
+        app:defaultValue="false"
         app:key="startAtBooted"
         app:summaryOff="不自启"
         app:summaryOn="自启"

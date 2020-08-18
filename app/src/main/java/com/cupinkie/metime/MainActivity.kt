@@ -36,6 +36,10 @@ class MainActivity : AppCompatActivity() {
     var sdfTimeSecond = SimpleDateFormat(":ss")
     var smallSecond = false
 
+    // socket相关
+    var clearTime = -1L
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,6 +105,7 @@ class MainActivity : AppCompatActivity() {
             val showYear = sp.getBoolean("showYear", true)
             val useWhiteText = sp.getBoolean("useWhiteText", false)
             val keepScreenOn = sp.getBoolean("keepScreenOn", false)
+            val startMsgSocket = sp.getBoolean("startMsgSocket", false)
 
             if (keepScreenOn) {
                 // 保持亮屏
@@ -119,14 +124,15 @@ class MainActivity : AppCompatActivity() {
             msgText.setPadding(0, marginTopMsg, 0, 0)
             msgText.textSize = msgFontSize.toFloat()
             if (useWhiteText) {
-//                timeText.setTextColor(this.resources.getColor(R.color.white_overlay))
                 timeText.setTextColor(ContextCompat.getColor(this, R.color.white_overlay_text))
                 dateText.setTextColor(ContextCompat.getColor(this, R.color.white_overlay_text))
                 tipText.setTextColor(ContextCompat.getColor(this, R.color.white_overlay_text))
+                msgText.setTextColor(ContextCompat.getColor(this, R.color.white_overlay_text))
             } else {
                 timeText.setTextColor(ContextCompat.getColor(this, R.color.black_overlay_text))
                 dateText.setTextColor(ContextCompat.getColor(this, R.color.black_overlay_text))
                 tipText.setTextColor(ContextCompat.getColor(this, R.color.black_overlay_text))
+                msgText.setTextColor(ContextCompat.getColor(this, R.color.white_overlay_text))
             }
 
             if (!tip.isNullOrBlank()) {
@@ -146,6 +152,8 @@ class MainActivity : AppCompatActivity() {
                     sdfTime = SimpleDateFormat("h:mm")
                 }
             }
+
+            // 换成bool大概能提升性能吧XD
             smallSecond = showSecond == "2"
 
             if (showYear) {
