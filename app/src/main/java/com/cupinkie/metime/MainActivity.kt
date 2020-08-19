@@ -5,10 +5,10 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.os.Handler
+import android.os.Message
 import android.util.Log
 import android.view.OrientationEventListener
 import android.view.Window
@@ -19,6 +19,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.*
+import java.net.ServerSocket
+import java.net.Socket
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -29,7 +32,7 @@ class MainActivity : AppCompatActivity() {
     // 默认横屏
     var screenOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
-    private var handler: Handler = Handler()
+    private var timeHandler: Handler = Handler()
     private var runnable: Runnable? = null
     var sdfDate = SimpleDateFormat("yyyy年M月d日 E")
     var sdfTime = SimpleDateFormat("h:mm")
@@ -38,6 +41,7 @@ class MainActivity : AppCompatActivity() {
 
     // socket相关
     var clearTime = -1L
+    var serverSocket: ServerSocket? = null
 
 
 
@@ -102,10 +106,11 @@ class MainActivity : AppCompatActivity() {
             val msgFontSize = sp.getString("msgFontSize", "40")!!.toInt()
             val use24hTime = sp.getBoolean("use24hTime", false)
             val showSecond = sp.getString("showSecond", "2")
-            val showYear = sp.getBoolean("showYear", true)
+            val showYear = sp.getBoolean("showYear", false)
             val useWhiteText = sp.getBoolean("useWhiteText", false)
             val keepScreenOn = sp.getBoolean("keepScreenOn", false)
             val startMsgSocket = sp.getBoolean("startMsgSocket", false)
+            val clearMsgSecond = sp.getString("clearMsgSecond", "60")!!.toInt()
 
             if (keepScreenOn) {
                 // 保持亮屏
@@ -124,15 +129,17 @@ class MainActivity : AppCompatActivity() {
             msgText.setPadding(0, marginTopMsg, 0, 0)
             msgText.textSize = msgFontSize.toFloat()
             if (useWhiteText) {
+                timeSecondText.setTextColor(ContextCompat.getColor(this, R.color.white_overlay_text))
                 timeText.setTextColor(ContextCompat.getColor(this, R.color.white_overlay_text))
                 dateText.setTextColor(ContextCompat.getColor(this, R.color.white_overlay_text))
                 tipText.setTextColor(ContextCompat.getColor(this, R.color.white_overlay_text))
                 msgText.setTextColor(ContextCompat.getColor(this, R.color.white_overlay_text))
             } else {
+                timeSecondText.setTextColor(ContextCompat.getColor(this, R.color.black_overlay_text))
                 timeText.setTextColor(ContextCompat.getColor(this, R.color.black_overlay_text))
                 dateText.setTextColor(ContextCompat.getColor(this, R.color.black_overlay_text))
                 tipText.setTextColor(ContextCompat.getColor(this, R.color.black_overlay_text))
-                msgText.setTextColor(ContextCompat.getColor(this, R.color.white_overlay_text))
+                msgText.setTextColor(ContextCompat.getColor(this, R.color.black_overlay_text))
             }
 
             if (!tip.isNullOrBlank()) {
@@ -166,6 +173,48 @@ class MainActivity : AppCompatActivity() {
                 val bitmap = BitmapFactory.decodeFile(photoPath)
                 bgImage.setImageBitmap(bitmap)
             }
+
+            // socket服务
+            if (startMsgSocket) {
+                 Thread(Runnable {
+                    try {
+                        serverSocket = ServerSocket(50803)
+                        Log.v("Socket", "监听启动成功")
+                        while (serverSocket != null) {
+                            // accept阻塞 Socket close了会直接抛异常出来
+                            val socket: Socket = serverSocket!!.accept()
+                            // 起新线程以便接下一个连接 连多了cpu会炸
+                            Thread(Runnable {
+                                try {
+                                    val reader = BufferedReader(InputStreamReader(socket.getInputStream()))
+                                    val writer = BufferedWriter(OutputStreamWriter(socket.getOutputStream()))
+                                    val msg = msgHandler.obtainMessage()
+                                    updateMsgText("已连接：" + socket.inetAddress.hostAddress)
+                                    while (serverSocket != null) {
+                                        // readLine阻塞 Socket close了会直接抛异常出来
+                                        val line = reader.readLine()
+                                        if (line != null) {
+                                            updateMsgText(line)
+                                            writer.write("ok\n")
+                                            writer.flush()
+                                            // 60s 清空
+                                            clearTime = if (clearMsgSecond == -1) -1L else clearMsgSecond * 1000 + System.currentTimeMillis()
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            }).start()
+                        }
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+                }).start()
+
+
+            }
+
+
         } catch (e: Exception) {
             Toast.makeText(this, "请检查设置：" + e.message, Toast.LENGTH_LONG).show()
             startActivity(
@@ -188,10 +237,16 @@ class MainActivity : AppCompatActivity() {
                     timeSecondText.text = sdfTimeSecond.format(d)
                 }
 
-                handler.postDelayed(this, 500)
+                // 顺便处理下 清空msg
+                if(clearTime != -1L && clearTime < d.time) {
+                    msgText.text = ""
+                    clearTime = -1L
+                }
+
+                timeHandler.postDelayed(this, 500)
             }
         }
-        handler.postDelayed(runnable, 1000)
+        timeHandler.postDelayed(runnable, 1000)
 
     }
 
@@ -205,11 +260,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy();
+        serverSocket?.close()
         orientationListener.disable()
         if (runnable != null) {
-            handler.removeCallbacks(runnable)
+            timeHandler.removeCallbacks(runnable)
         }
+        super.onDestroy();
+    }
+
+    // msg Text Handler
+    private val msgHandler = object : Handler() {
+        override fun handleMessage(msg: Message?) {
+            super.handleMessage(msg)
+            val text = msg?.obj.toString()
+            msgText.text = text
+            Log.v("msg", text)
+        }
+    }
+
+    fun updateMsgText(text: String) {
+        val msg = msgHandler.obtainMessage();
+        msg.obj = text
+        msgHandler.sendMessage(msg)
     }
 
 

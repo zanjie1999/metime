@@ -125,8 +125,8 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy();
         orientationListener.disable();
+        super.onDestroy();
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {

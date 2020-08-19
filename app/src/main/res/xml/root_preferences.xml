@@ -90,7 +90,7 @@
         app:title="时间格式" />
 
     <ListPreference
-        android:defaultValue="1"
+        android:defaultValue="2"
         android:entries="@array/showSecond"
         android:entryValues="@array/showSecond_values"
         android:key="showSecond"
@@ -121,6 +121,12 @@
         app:summaryOff="关闭"
         app:summaryOn="Socket监听端口：50803"
         app:title="消息接收服务" />
+
+    <EditTextPreference
+        app:defaultValue="60"
+        app:key="clearMsgSecond"
+        app:title="消息清空倒计时（秒）"
+        app:useSimpleSummaryProvider="true" />
 
     <SwitchPreferenceCompat
         app:defaultValue="false"
