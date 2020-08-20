@@ -38,10 +38,12 @@ class MainActivity : AppCompatActivity() {
     var sdfTime = SimpleDateFormat("h:mm")
     var sdfTimeSecond = SimpleDateFormat(":ss")
     var smallSecond = false
+    var clearMsgSecond = 60
 
     // socket相关
     var clearTime = -1L
     var serverSocket: ServerSocket? = null
+    var socket: Socket? = null
 
 
 
@@ -110,7 +112,7 @@ class MainActivity : AppCompatActivity() {
             val useWhiteText = sp.getBoolean("useWhiteText", false)
             val keepScreenOn = sp.getBoolean("keepScreenOn", false)
             val startMsgSocket = sp.getBoolean("startMsgSocket", false)
-            val clearMsgSecond = sp.getString("clearMsgSecond", "60")!!.toInt()
+            clearMsgSecond = sp.getString("clearMsgSecond", "60")!!.toInt()
 
             if (keepScreenOn) {
                 // 保持亮屏
@@ -182,23 +184,26 @@ class MainActivity : AppCompatActivity() {
                         Log.v("Socket", "监听启动成功")
                         while (serverSocket != null) {
                             // accept阻塞 Socket close了会直接抛异常出来
-                            val socket: Socket = serverSocket!!.accept()
+                            val newSocket = serverSocket!!.accept()
+                            // 连新的就关闭旧的 节省cpu资源
+                            socket?.close()
+                            socket = newSocket
                             // 起新线程以便接下一个连接 连多了cpu会炸
                             Thread(Runnable {
                                 try {
-                                    val reader = BufferedReader(InputStreamReader(socket.getInputStream()))
-                                    val writer = BufferedWriter(OutputStreamWriter(socket.getOutputStream()))
-                                    val msg = msgHandler.obtainMessage()
-                                    updateMsgText("已连接：" + socket.inetAddress.hostAddress)
-                                    while (serverSocket != null) {
-                                        // readLine阻塞 Socket close了会直接抛异常出来
-                                        val line = reader.readLine()
-                                        if (line != null) {
-                                            updateMsgText(line)
-                                            writer.write("ok\n")
-                                            writer.flush()
-                                            // 60s 清空
-                                            clearTime = if (clearMsgSecond == -1) -1L else clearMsgSecond * 1000 + System.currentTimeMillis()
+                                    if (socket != null) {
+                                        val reader = BufferedReader(InputStreamReader(socket!!.getInputStream()))
+                                        val writer = BufferedWriter(OutputStreamWriter(socket!!.getOutputStream()))
+                                        val msg = msgHandler.obtainMessage()
+                                        updateMsgText("已连接：" + socket!!.inetAddress.hostAddress)
+                                        while (socket!!.isConnected) {
+                                            // readLine阻塞 Socket close了会直接抛异常出来
+                                            val line = reader.readLine()
+                                            if (line != null) {
+                                                updateMsgText(line)
+                                                writer.write("ok\n")
+                                                writer.flush()
+                                            }
                                         }
                                     }
                                 } catch (e: Exception) {
@@ -275,6 +280,8 @@ class MainActivity : AppCompatActivity() {
             val text = msg?.obj.toString()
             msgText.text = text
             Log.v("msg", text)
+            // 定时清空
+            clearTime = if (clearMsgSecond == -1) -1L else clearMsgSecond * 1000 + System.currentTimeMillis()
         }
     }
 

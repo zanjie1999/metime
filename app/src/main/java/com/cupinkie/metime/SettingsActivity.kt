@@ -143,7 +143,10 @@ class SettingsActivity : AppCompatActivity() {
                 "marginRightDate",
                 "timeFontSize",
                 "dateFontSize",
-                "tipFontSize"
+                "tipFontSize",
+                "marginTopMsg",
+                "msgFontSize",
+                "clearMsgSecond"
             )) {
                 val numberPreference = findPreference<EditTextPreference>(key)
                 Log.v("onCreatePreferences", key + ": " + numberPreference)
