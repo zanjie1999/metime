@@ -5,61 +5,82 @@
         app:defaultValue=""
         app:key="tip"
         app:title="提醒"
-        app:summary=" "/>
+        app:useSimpleSummaryProvider="true" />
 
     <Preference
-        app:title="选择背景图片目录"
+        app:title="选择背景图片"
         app:key="photoPath"
-        app:summary=" "/>
+        app:useSimpleSummaryProvider="true" />
+
+    <PreferenceCategory android:title="边距">
 
     <EditTextPreference
         app:defaultValue="15"
-        app:key="marginTop"
-        android:inputType="number"
-        app:title="上边距"
-        app:summary=" "/>
+        app:key="marginTopTip"
+        app:title="提醒上边距"
+        app:useSimpleSummaryProvider="true" />
+
+    <EditTextPreference
+        app:defaultValue="55"
+        app:key="marginTopMsg"
+        app:title="消息上边距"
+        app:useSimpleSummaryProvider="true" />
 
     <EditTextPreference
         app:defaultValue="15"
-        app:key="marginBottom"
-        android:inputType="number"
-        app:title="下边距"
-        app:summary=" "/>
+        app:key="marginBottomTime"
+        app:title="时间下边距"
+        app:useSimpleSummaryProvider="true" />
 
     <EditTextPreference
         app:defaultValue="40"
-        app:key="marginLeft"
-        android:inputType="number"
-        app:title="左边距"
-        app:summary=" "/>
+        app:key="marginLeftTime"
+        app:title="时间左边距"
+        app:useSimpleSummaryProvider="true" />
+
+    <EditTextPreference
+        app:defaultValue="20"
+        app:key="marginBottomDate"
+        app:title="日期下边距"
+        app:useSimpleSummaryProvider="true" />
 
     <EditTextPreference
         app:defaultValue="40"
-        app:key="marginRight"
-        android:inputType="number"
-        app:title="右边距"
-        app:summary=" "/>
+        app:key="marginRightDate"
+        app:title="日期右边距"
+        app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="大小">
 
     <EditTextPreference
         app:defaultValue="70"
         app:key="timeFontSize"
-        android:inputType="number"
         app:title="时间大小"
-        app:summary=" "/>
+        app:useSimpleSummaryProvider="true" />
 
     <EditTextPreference
         app:defaultValue="30"
         app:key="dateFontSize"
-        android:inputType="number"
         app:title="日期大小"
-        app:summary=" "/>
+        app:useSimpleSummaryProvider="true" />
 
     <EditTextPreference
         app:defaultValue="30"
         app:key="tipFontSize"
-        android:inputType="number"
+        app:title="提醒大小"
+        app:useSimpleSummaryProvider="true" />
+
+    <EditTextPreference
+        app:defaultValue="40"
+        app:key="msgFontSize"
         app:title="消息大小"
-        app:summary=" "/>
+        app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="样式">
 
     <SwitchPreferenceCompat
         app:defaultValue="false"
@@ -68,12 +89,44 @@
         app:summaryOn="24小时制"
         app:title="时间格式" />
 
-    <SwitchPreferenceCompat
-        app:defaultValue="true"
-        app:key="showSecond"
+    <ListPreference
+        android:defaultValue="2"
+        android:entries="@array/showSecond"
+        android:entryValues="@array/showSecond_values"
+        android:key="showSecond"
+        android:title="秒"
+        app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+        app:defaultValue="false"
+        app:key="showYear"
         app:summaryOff="不显示"
         app:summaryOn="显示"
-        app:title="秒" />
+        app:title="年" />
+
+    <SwitchPreferenceCompat
+        app:defaultValue="false"
+        app:key="useWhiteText"
+        app:summaryOff="黑"
+        app:summaryOn="白"
+        app:title="字体颜色" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="高级">
+
+    <SwitchPreferenceCompat
+        app:defaultValue="false"
+        app:key="startMsgSocket"
+        app:summaryOff="关闭"
+        app:summaryOn="Socket监听端口：50803"
+        app:title="消息接收服务" />
+
+    <EditTextPreference
+        app:defaultValue="60"
+        app:key="clearMsgSecond"
+        app:title="消息清空倒计时（秒）"
+        app:useSimpleSummaryProvider="true" />
 
     <SwitchPreferenceCompat
         app:defaultValue="false"
@@ -81,5 +134,21 @@
         app:summaryOff="不自启"
         app:summaryOn="自启"
         app:title="开机自动启动" />
+
+    <SwitchPreferenceCompat
+        app:defaultValue="false"
+        app:key="keepScreenOn"
+        app:summaryOff="系统默认"
+        app:summaryOn="保持亮屏"
+        app:title="保持屏幕常亮" />
+
+    <SwitchPreferenceCompat
+        app:defaultValue="true"
+        app:key="landscapeScreen"
+        app:summaryOff="纵向"
+        app:summaryOn="横向"
+        app:title="屏幕方向" />
+
+    </PreferenceCategory>
 
 </PreferenceScreen>
