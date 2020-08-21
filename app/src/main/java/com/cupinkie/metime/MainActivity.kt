@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity() {
             val photoPath = sp.getString("photoPath", "")
             val marginTopTip = (sp.getString("marginTopTip", "15")!!.toInt() * scale + 0.5f).toInt()
             val marginTopMsg = (sp.getString("marginTopMsg", "55")!!.toInt() * scale + 0.5f).toInt()
-            val marginBottomTime = (sp.getString("marginBottomTime", "15")!!.toInt() * scale + 0.5f).toInt()
+            val marginBottomTime = (sp.getString("marginBottomTime", "10")!!.toInt() * scale + 0.5f).toInt()
             val marginBottomDate = (sp.getString("marginBottomDate", "15")!!.toInt() * scale + 0.5f).toInt()
             val marginLeftTime = (sp.getString("marginLeftTime", "40")!!.toInt() * scale + 0.5f).toInt()
             val marginRightDate = (sp.getString("marginRightDate", "40")!!.toInt() * scale + 0.5f).toInt()

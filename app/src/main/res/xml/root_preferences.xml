@@ -27,7 +27,7 @@
         app:useSimpleSummaryProvider="true" />
 
     <EditTextPreference
-        app:defaultValue="15"
+        app:defaultValue="10"
         app:key="marginBottomTime"
         app:title="时间下边距"
         app:useSimpleSummaryProvider="true" />
