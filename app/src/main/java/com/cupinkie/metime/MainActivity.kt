@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             // 准备界面  字体自带边缘所以小秒底部x2
-            timeSecondText.setPadding(0, 0, 0, marginBottomTime * 2)
+            timeSecondText.setPadding(0, 0, 0, (timeFontSize * 0.6 + marginBottomTime).toInt())
             timeSecondText.textSize = timeFontSize.toFloat() / 2
             timeText.setPadding(marginLeftTime, 0, 0, marginBottomTime)
             timeText.textSize = timeFontSize.toFloat()
@@ -194,7 +194,6 @@ class MainActivity : AppCompatActivity() {
                                     if (socket != null) {
                                         val reader = BufferedReader(InputStreamReader(socket!!.getInputStream()))
                                         val writer = BufferedWriter(OutputStreamWriter(socket!!.getOutputStream()))
-                                        val msg = msgHandler.obtainMessage()
                                         updateMsgText("已连接：" + socket!!.inetAddress.hostAddress)
                                         while (socket!!.isConnected) {
                                             // readLine阻塞 Socket close了会直接抛异常出来
