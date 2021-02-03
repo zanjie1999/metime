@@ -17,7 +17,7 @@ class StartReceiver : BroadcastReceiver() {
         val startAtBooted = sp.getBoolean("startAtBooted", false)
         Log.v("metime", "startAtBooted："+ startAtBooted)
         if (startAtBooted) {
-            Toast.makeText(context, "咩时间启动啦~", Toast.LENGTH_LONG)
+            Toast.makeText(context, "咩时间启动啦~", Toast.LENGTH_LONG).show()
             val intent = Intent(context, MainActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
