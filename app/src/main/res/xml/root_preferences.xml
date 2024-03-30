@@ -1,6 +1,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <PreferenceCategory android:title="本应用不联网，文件权限用于自定义背景图显示，不需要任何额外权限，不收集任何内容">
+
     <EditTextPreference
         app:defaultValue=""
         app:key="tip"
@@ -11,6 +13,8 @@
         app:title="选择背景图片"
         app:key="photoPath"
         app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
 
     <PreferenceCategory android:title="边距">
 
