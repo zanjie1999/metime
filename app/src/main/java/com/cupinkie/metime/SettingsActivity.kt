@@ -165,7 +165,7 @@ class SettingsActivity : AppCompatActivity() {
 
                 true
             }
-            photoPath?.summary = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("photoPath", "未选择")
+            photoPath?.summary = PreferenceManager.getDefaultSharedPreferences(requireContext()).getString("photoPath", "未选择")
 
 
         }

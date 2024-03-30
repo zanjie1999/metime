@@ -13,12 +13,13 @@ import android.util.Log
 import android.view.OrientationEventListener
 import android.view.Window
 import android.view.WindowManager
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
-import kotlinx.android.synthetic.main.activity_main.*
 import java.io.*
 import java.net.ServerSocket
 import java.net.Socket
@@ -120,6 +121,13 @@ class MainActivity : AppCompatActivity() {
             }
 
             // 准备界面  字体自带边缘所以小秒底部x2
+            val timeSecondText = findViewById<TextView>(R.id.timeSecondText)
+            val timeText = findViewById<TextView>(R.id.timeText)
+            val dateText = findViewById<TextView>(R.id.dateText)
+            val tipText = findViewById<TextView>(R.id.tipText)
+            val msgText = findViewById<TextView>(R.id.msgText)
+            val bgImage = findViewById<ImageView>(R.id.bgImage)
+
             timeSecondText.setPadding(0, 0, 0, (timeFontSize * 0.6 + marginBottomTime).toInt())
             timeSecondText.textSize = timeFontSize.toFloat() / 2
             timeText.setPadding(marginLeftTime, 0, 0, marginBottomTime)
@@ -234,6 +242,11 @@ class MainActivity : AppCompatActivity() {
         // 时间显示线程
         runnable = object : Runnable {
             override fun run() {
+                val timeText = findViewById<TextView>(R.id.timeText)
+                val dateText = findViewById<TextView>(R.id.dateText)
+                val timeSecondText = findViewById<TextView>(R.id.timeSecondText)
+                val msgText = findViewById<TextView>(R.id.msgText)
+
                 val d = Date()
                 timeText.text = sdfTime.format(d)
                 dateText.text = sdfDate.format(d)
@@ -250,7 +263,7 @@ class MainActivity : AppCompatActivity() {
                 timeHandler.postDelayed(this, 500)
             }
         }
-        timeHandler.postDelayed(runnable, 1000)
+        timeHandler.postDelayed(runnable as Runnable, 1000)
 
     }
 
@@ -267,16 +280,19 @@ class MainActivity : AppCompatActivity() {
         serverSocket?.close()
         orientationListener.disable()
         if (runnable != null) {
-            timeHandler.removeCallbacks(runnable)
+            timeHandler.removeCallbacks(runnable!!)
         }
         super.onDestroy();
     }
 
     // msg Text Handler
     private val msgHandler = object : Handler() {
-        override fun handleMessage(msg: Message?) {
-            super.handleMessage(msg)
+        override fun handleMessage(msg: Message) {
+            if (msg != null) {
+                super.handleMessage(msg)
+            }
             val text = msg?.obj.toString()
+            val msgText = findViewById<TextView>(R.id.msgText)
             msgText.text = text
             Log.v("msg", text)
             // 定时清空
